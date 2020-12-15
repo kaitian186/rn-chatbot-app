@@ -15,14 +15,12 @@ interface MessageListProps {
 
 export const MessageList: React.FC<MessageListProps> = (props) => {
   const contentRef = useRef<ScrollView>(null);
-  const botIcon = <Icon name="user" size={30} color="#900" style={styles.botIcon} />;
-  const userIcon = <Icon name="user" size={30} color="green" style={styles.userIcon} />;
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       ref={contentRef}
       onContentSizeChange={() => {
-        contentRef.current?.scrollTo({animated: true});
+        contentRef.current?.scrollTo({ animated: true });
       }}
       scrollEnabled={true}
       style={styles.messageListContainer}
@@ -33,25 +31,42 @@ export const MessageList: React.FC<MessageListProps> = (props) => {
         style={styles.fluid}
         keyboardVerticalOffset={230}
       >
-      <View style={styles.messageListWrap}>
-        {
-          props.contents.map((content) => {
-            return (
-              <View key={content.key} style={content.sender === UserType.BOT ? styles.botStyle : styles.userStyle}>
-                { content.sender === UserType.BOT ? botIcon : userIcon}
-                <View style={content.sender === UserType.BOT ? styles.botMessage : styles.userMessage}>
-                  <Text style={content.sender === UserType.BOT ? styles.botContent : styles.userContent}>{content.context}
-                  </Text>
-                </View>
-              </View>
-            )
-          })
-        }
-      </View>
+        <View style={styles.messageListWrap}>
+          {props.contents.map((content) => (
+            content.sender === UserType.BOT ?
+             <BotMessage key={content.key} text={content.context}/> :
+             <UserMessage key={content.key} text={content.context} />
+          ))}
+        </View>
       </KeyboardAvoidingView>
     </ScrollView>
   );
 }
+
+interface UserMessageProps {
+  key: number,
+  text: string,
+}
+
+const UserMessage: React.FC<UserMessageProps> = ({key, text}) => (
+  <View key={key} style={styles.userStyle}>
+    <Icon name="user" size={30} color="green" style={styles.userIcon} />
+    <View style={styles.userMessage}>
+      <Text style={styles.userContent}>{text}
+      </Text>
+    </View>
+  </View>
+)
+
+const BotMessage: React.FC<UserMessageProps> = ({key, text}) => (
+  <View key={key} style={styles.botStyle}>
+    <Icon name="user" size={30} color="#900" style={styles.botIcon} />
+    <View style={styles.botMessage}>
+      <Text style={styles.botContent}>{text}
+      </Text>
+    </View>
+  </View>
+)
 
 const styles = StyleSheet.create({
   messageListContainer: {
@@ -64,7 +79,7 @@ const styles = StyleSheet.create({
   messageListWrap: {
     flexGrow: 1,
     paddingTop: 20,
-    marginBottom: 10,  
+    marginBottom: 10,
   },
   botStyle: {
     width: '100%',
